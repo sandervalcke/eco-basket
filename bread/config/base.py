@@ -10,13 +10,18 @@ def get_secret_key(filepath='.secret_key'):
 
     """
     filename = os.path.join(filepath)
-    try:
-        with open(filename, 'rb') as f:
-            return f.read()
-    except IOError:
-        print('Error: No secret key. Create it with:')
-        print('head -c 64 /dev/urandom >', filename)
-        sys.exit(1)
+
+    if 'BREAD_SECRET_KEY' in os.environ:
+        return os.environ.get('BREAD_SECRET_KEY')
+    else:
+        try:
+            with open(filename, 'rb') as f:
+                return f.read()
+        except IOError:
+            print('Error: No secret key. Create it with:')
+            print('head -c 64 /dev/urandom >', filename)
+            print('or set BREAD_SECRET_KEY')
+            sys.exit(1)
 
 
 def get_db_connection_string(prefix):
