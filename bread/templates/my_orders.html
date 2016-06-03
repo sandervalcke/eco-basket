@@ -1,0 +1,76 @@
+{% from "_macros.html" import render_field, render_field_nolabel %}
+
+{% extends "base.html" %}
+
+{% set active_page = "my_orders" %}
+
+{% block content %}
+{% for order_data in order_data_list %}
+<div class="row">
+<div class="col-md-2">
+  <h4><a href="{{url_for('single_order', id=order_data.order.id)}}">{{order_data.order.name}}</a></h4>
+  <p>{{format_date(order_data.order.delivery_date)}}</p>
+</div>
+<div class="col-md-6">
+<form class="form-horizontal" method="POST">
+  {{ order_data.form.order_id }}
+  {{ order_data.form.csrf_token }}
+  <div class="table-responsive">
+    <table class="table table-condensed">
+      <thead>
+        <tr>
+          <th class="col-md-3">Item</th>
+          <th class="col-md-1">Quantity</th>
+          <th class="col-md-1">Price (€)</th>
+          <th class="col-md-1"></th>
+        </tr>
+      </thead>
+      {% for order_item in order_data.items %}
+      <tr>
+        <td>{{ order_item.item.name }}</td>
+        <td>{{ order_item.quantity }}</td>
+        <td>{{ order_item.item.price * order_item.quantity }}</td>
+        <td>
+          {% if not order_data.order.is_closed %}
+          {# Will use 'name' to know if it's a delete button #}
+          <button name="delete_item_{{order_item.id}}" class="btn btn-default"><span class="glyphicon glyphicon-minus-sign"></span></button>
+          {% endif %}
+        </td>
+      </tr>
+      {# Order item loop #}
+      {% endfor %}
+      {#
+      Row for the total price
+      #}
+      <tr>
+        <td>Total</td>
+        <td>{{ order_data.quantity }}</td>
+        <td>{{ order_data.price }}</td>
+        <td></td>
+      </tr>
+      {#
+      Add a row for placing new orders
+      #}
+      {% if not order_data.order.is_closed %}
+      <tr>
+        <td>
+          {{ render_field_nolabel(order_data.form.item) }}
+        </td>
+        <td>
+          {{ render_field_nolabel(order_data.form.quantity) }}
+        </td>
+        <td></td>
+        <td>
+          <button name="add_item" type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign"></span></button>
+        </td>
+      </tr>
+      {% endif %}
+      {# order is not closed #}
+    </table>
+  </div>
+</form>
+</div>
+</div>
+{# Loop over orders #}
+{% endfor %}
+{% endblock %}

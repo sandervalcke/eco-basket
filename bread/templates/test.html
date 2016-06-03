@@ -1,0 +1,125 @@
+<html>
+  <head>
+    {% if title %}
+    <title>{{ title }} - Bread</title>
+    {% else %}
+    <title>Bread</title>
+    {% endif %}
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/theme.css') }}" rel="stylesheet">
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/application.js') }}"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body role="document">
+  <div class="container theme-showcase">
+    <h2>Centering with offsets (column centering recipes for Bootstrap)</h2>
+    <div class="row">
+      <div class="col-md-4 col-md-offset=4">2</div>
+    </div>
+    <div class="row">
+        <div class="col-md-2 col-md-offset-4">2</div>
+        <div class="col-md-2">2</div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-3 col-md-offset-3">3</div>
+        <div class="col-md-3">3</div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-3 col-md-offset-2">3</div>
+        <div class="col-md-3">3</div>
+        <div class="col-md-3">3</div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-2 col-md-offset-3">2</div>
+        <div class="col-md-2">2</div>
+        <div class="col-md-2">2</div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-4 col-md-offset-2">4</div>
+        <div class="col-md-4">4</div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-4">4</div>
+        <div class="col-md-4">4</div>
+        <div class="col-md-4">4</div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-sm-2 col-sm-offset-5 text-center">2
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-sm-11 col-sm-offset-1 hid">
+            <div class="row">
+                <div class="col-sm-3 col-sm-offset-4 text-center">
+                    3
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-sm-10 col-sm-offset-1 hid">
+            <div class="row">
+                <div class="col-sm-4 col-sm-offset-4 text-center">
+                    3.5
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-sm-4 col-sm-offset-4  text-center">4
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-sm-10 col-sm-offset-1 hid">
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 text-center">
+                    5
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+            6
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-sm-10 col-sm-offset-1 hid">
+            <div class="row">
+                <div class="col-sm-2 col-sm-offset-5">
+                    1.5
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-sm-10 col-sm-offset-1 hid">
+            <div class="row">
+                <div class="col-sm-10 col-sm-offset-1 hid">
+                    <div class="row">
+                        <div class="col-sm-2 col-sm-offset-5">
+                            1
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{% macro render_field(field, label_visible=true, form_group=true) -%}
+ <div class="{% if form_group %}form-group{% endif %} {% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}">
+    {% if field.type != 'HiddenField' and label_visible %}
+      {{ field.label(class="control-label") }}
+      {#<label for="{{ field.id }}" class="control-label">{{ field.label }}</label>#}
+    {% endif %}
+    {{ field(class_='form-control', **kwargs) }}
+    {% if field.errors %}
+      {% for e in field.errors %}
+        <p class="help-block">{{ e }}</p>
+      {% endfor %}
+    {% endif %}
+  </div>
+{%- endmacro %}
+
+
+{% macro render_field_nolabel(field, label_visible=true, form_group=true) -%}
+  <div class="{% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}">
+    {{ field(class_='form-control', **kwargs) }}
+    {% if field.errors %}
+      {% for e in field.errors %}
+        <p class="help-block">{{ e }}</p>
+      {% endfor %}
+    {% endif %}
+  </div>
+{%- endmacro %}

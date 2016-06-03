@@ -1,0 +1,45 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% set active_page = "all_orders" %}
+
+{% block content %}
+
+<div class="row">
+<div class="col-md-8">
+<div class="table-responsive">
+<table class="table table-condensed">
+  <thead>
+  <tr>
+    <th class="col-md-2">Order</th>
+    <th class="col-md-1">Delivery</th>
+    <th class="col-md-1">Closed</th>
+    <th class="col-md-1">Status</th>
+    <th>Producer</th>
+    <th class="col-md-1">Items</th>
+    <th class="col-md-1">Price (€)</th>
+  </tr>
+  </thead>
+  {% for order in orders %}
+  <tr>
+    <td><a href="{{url_for('single_order', id=order.id)}}">{{order.name}}</a></td>
+    <td>{{ format_date(order.delivery_date) }}</td>
+    <td>{{ format_date(order.close_date) }}</td>
+    <td>
+      {% if order.is_closed %}
+      <span class="label label-warning">Closed</span>
+      {% else %}
+      <span class="label label-success">Open</span>
+      {% endif %}
+    </td>
+    <td>{{ order.producer.name }}</td>
+    <td>{{ order.total_quantity }}</td>
+    <td>{{ order.total_price }}</td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,65 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% set active_page = "orders" %}
+
+{% block content %}
+<div class="row">
+<div class="col-md-3">
+<div class="table-responsive">
+{# TODO Re-use order item code from orders.html? #}
+<table class="table table-condensed">
+  <tr>
+    <td class="col-md-1">Order</td>
+    <td class="col-md-2">{{order.name}}</td>
+  </tr>
+  <tr>
+    <td>Date</td>
+    <td>{{format_date(order.delivery_date)}}</td>
+  </tr>
+  <tr>
+    <td>Items</td>
+    <td>{{order.total_quantity}}</td>
+  </tr>
+  <tr>
+    <td>Total Amount</td>
+    <td>€ {{order.total_price}}</td>
+  </tr>
+  <tr>
+    <td>Status</td>
+    <td>
+      {% if order.is_closed %}
+        <span class="label label-warning">Closed</span>
+      {% else %}
+        <span class="label label-success">Open</span>
+      {% endif %}
+    </td>
+  </tr>
+</table>
+</div>
+</div>
+</div>
+
+<div class="row">
+<div class="table-responsive">
+<table class="table table-condensed">
+  <thead>
+    <tr>
+      <th>Item</th>
+      <th>Quantity</th>
+      <th>Customer</th>
+      <th>Price (€)</th>
+    </tr>
+  </thead>
+  {% for order_item in order.order_items %}
+  <tr>
+    <td>{{ order_item.item.name }}</td>
+    <td>{{ order_item.quantity }}</td>
+    <td>{{ order_item.user.print_name()}}</td>
+    <td>{{ order_item.item.price * order_item.quantity }}</td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+</div>
+{% endblock %}
