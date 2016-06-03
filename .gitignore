@@ -60,3 +60,11 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# pycharm
+.access^
+.attribute^
+
+bread.db
+scripts
+.environment.sh
