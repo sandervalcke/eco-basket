@@ -64,6 +64,7 @@ target/
 # pycharm
 .access^
 .attribute^
+.idea
 
 bread.db
 scripts
