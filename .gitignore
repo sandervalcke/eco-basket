@@ -67,7 +67,6 @@ target/
 .idea
 
 bread.db
-scripts
 .environment.sh
 .secret_key
 *~
