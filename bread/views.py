@@ -25,8 +25,12 @@ def utilty_processor():
         else:
             return ""
 
+    def format_currency(currency):
+        return "{}".format(currency)
+
     return dict(format_time=format_time,
-                format_date=format_date)
+                format_date=format_date,
+                format_currency=format_currency)
 
 
 @app.context_processor

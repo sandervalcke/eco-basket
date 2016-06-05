@@ -1,10 +1,13 @@
+import sys, os
+sys.path.append(os.path.join(sys.path[0], '..'))
+
 import csv
 from bread import database
 from bread.application import db
 from datetime import datetime, timedelta
 
 
-input_file = r"/home/adversus/Desktop/brood"
+input_file = r"scripts/brood"
 
 orders = database.DbOrder.query.order_by(database.DbOrder.delivery_date_utc).all()
 
