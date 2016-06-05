@@ -11,9 +11,8 @@ from bread.application import app, db
 class MyAdminIndexView(admin.AdminIndexView):
     """
     Custom admin class to force a user to be authenticated.
-
-    TODO force admin role
     """
+    # TODO force admin role
     @expose('/')
     @login_required
     def index(self):
