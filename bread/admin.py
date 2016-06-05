@@ -1,11 +1,29 @@
-from flask_admin import Admin
+from flask.ext import admin
+from flask.ext.security import current_user, login_required
 from flask_admin.contrib.sqla import ModelView
+from flask.ext.admin import expose
 
 import bread.database as database
 from bread.application import app, db
 
 
-admin = Admin(app, name='Bread admin', template_mode='bootstrap3')
+# See https://github.com/mrjoes/flask-admin/blob/master/examples/auth/app.py
+class MyAdminIndexView(admin.AdminIndexView):
+    """
+    Custom admin class to force a user to be authenticated.
+
+    TODO force admin role
+    """
+    @expose('/')
+    @login_required
+    def index(self):
+        return super(MyAdminIndexView, self).index()
+
+
+admin = admin.Admin(app,
+                    name='Bread admin',
+                    index_view=MyAdminIndexView(),
+                    template_mode='bootstrap3')
 
 
 class ChildView(ModelView):
