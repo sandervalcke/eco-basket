@@ -34,7 +34,7 @@
     </td>
     <td>{{ order.producer.name }}</td>
     <td>{{ order.total_quantity }}</td>
-    <td>{{ order.total_price }}</td>
+    <td>{{ format_currency(order.total_price) }}</td>
   </tr>
   {% endfor %}
 </table>

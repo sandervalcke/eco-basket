@@ -26,7 +26,7 @@ def utilty_processor():
             return ""
 
     def format_currency(currency):
-        return "{}".format(currency)
+        return "{:.1f}".format(currency)
 
     return dict(format_time=format_time,
                 format_date=format_date,
