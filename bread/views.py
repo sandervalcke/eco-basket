@@ -2,6 +2,7 @@ from collections import namedtuple
 
 from flask import render_template, request, flash, redirect, url_for
 from flask.ext.security import login_required, roles_required, logout_user, current_user
+from sqlalchemy.sql import func
 
 from bread.application import app, db
 from bread import database
@@ -150,10 +151,24 @@ def single_order(id):
         flash('Order {} not found'.format(id))
         # Dummy empty object for view code
         order = database.DbOrder()
+        grouped_items = []
+    else:
+        # DbOrderItem first in select to make joins work implicitly
+        # select from DB instead of doing the sum on the order.order_items: choice
+        # to put load on DB, not on app.
+        grouped_items = (db.session.query(func.sum(database.DbOrderItem.quantity).label('quantity'),
+                                          database.DbItem.name)
+                         .join(database.DbOrder).filter(database.DbOrder.id == order.id)
+                         .join(database.DbItem)
+                         .group_by(database.DbItem.name)
+                         .order_by(database.DbItem.name)
+                         .all()
+                         )
 
     return render_template(
         'order.html',
-        order=order
+        order=order,
+        grouped_items=grouped_items
     )
 
 

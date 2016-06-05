@@ -5,13 +5,17 @@
 
 {% block content %}
 <div class="row">
-<div class="col-md-3">
+<div class="col-md-6">
+<h4>Order Info</h4>
 <div class="table-responsive">
-{# TODO Re-use order item code from orders.html? #}
 <table class="table table-condensed">
+  <thead>
+    <th class="col-md-2"></th>
+    <th class="col-md-4"></th>
+  </thead>
   <tr>
-    <td class="col-md-1">Order</td>
-    <td class="col-md-2">{{order.name}}</td>
+    <td>Order</td>
+    <td>{{order.name}}</td>
   </tr>
   <tr>
     <td>Date</td>
@@ -23,7 +27,7 @@
   </tr>
   <tr>
     <td>Total Amount</td>
-    <td>€ {{order.total_price}}</td>
+    <td>€ {{ format_currency(order.total_price) }}</td>
   </tr>
   <tr>
     <td>Status</td>
@@ -38,9 +42,29 @@
 </table>
 </div>
 </div>
+<div class="col-md-6">
+<h4>Items</h4>
+<div class="table-responsive">
+<table class="table table-condensed">
+  <thead>
+  <tr>
+    <th class="col-md-4">Item</th>
+    <th class="col-md-2">Quantity</th>
+  </tr>
+  </thead>
+  {% for grouped_item in grouped_items %}
+  <tr>
+    <td>{{ grouped_item.name }}</td>
+    <td>{{ grouped_item.quantity }}</td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+</div>
 </div>
 
 <div class="row">
+<h4>Individual Orders</h4>
 <div class="table-responsive">
 <table class="table table-condensed">
   <thead>
