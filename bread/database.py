@@ -134,6 +134,16 @@ class DbOrder(Base):
         return self.compute_price(self.order_items)
 
     @property
+    def price_to_be_payed(self):
+        return sum([order_item.item.price * order_item.quantity
+                    for order_item in self.order_items if not order_item.payed])
+
+    @property
+    def price_payed(self):
+        return sum([order_item.item.price * order_item.quantity
+                    for order_item in self.order_items if order_item.payed])
+
+    @property
     def is_closed(self):
         return set_utc_zone(datetime.utcnow()) > set_utc_zone(self.close_date_utc)
 
@@ -147,6 +157,7 @@ class DbOrderItem(Base):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     item_id = Column(Integer, ForeignKey('items.id'), nullable=False)
     quantity = Column(Integer, nullable=False, server_default='0')
+    payed = Column(Boolean, nullable=False, server_default='0')
 
     order = relationship('DbOrder', backref='order_items')
     item  = relationship('DbItem')

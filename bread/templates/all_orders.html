@@ -6,7 +6,7 @@
 {% block content %}
 
 <div class="row">
-<div class="col-md-8">
+<div class="col-md-10">
 <div class="table-responsive">
 <table class="table table-condensed">
   <thead>
@@ -18,6 +18,8 @@
     <th>Producer</th>
     <th class="col-md-1">Items</th>
     <th class="col-md-1">Price (€)</th>
+    <th class="col-md-1">Due (€)</th>
+    <th class="col-md-1">Payed (€)</th>
   </tr>
   </thead>
   {% for order in orders %}
@@ -35,6 +37,8 @@
     <td>{{ order.producer.name }}</td>
     <td>{{ order.total_quantity }}</td>
     <td>{{ format_currency(order.total_price) }}</td>
+    <td>{{ format_currency(order.price_to_be_payed) }}</td>
+    <td>{{ format_currency(order.price_payed) }}</td>
   </tr>
   {% endfor %}
 </table>

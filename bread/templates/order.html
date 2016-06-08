@@ -1,5 +1,6 @@
 <!-- extend base layout -->
 {% extends "base.html" %}
+{% from "_macros.html" import render_payed %}
 
 {% set active_page = "orders" %}
 
@@ -28,6 +29,14 @@
   <tr>
     <td>Total Amount</td>
     <td>€ {{ format_currency(order.total_price) }}</td>
+  </tr>
+  <tr>
+    <td>To be payed</td>
+    <td>€ {{ format_currency(order.price_to_be_payed) }}</td>
+  </tr>
+  <tr>
+    <td>Payed</td>
+    <td>€ {{ format_currency(order.price_payed) }}</td>
   </tr>
   <tr>
     <td>Status</td>
@@ -73,6 +82,7 @@
       <th>Quantity</th>
       <th>Customer</th>
       <th>Price (€)</th>
+      <th>Status</th>
     </tr>
   </thead>
   {% for order_item in order.order_items %}
@@ -81,6 +91,7 @@
     <td>{{ order_item.quantity }}</td>
     <td>{{ order_item.user.print_name()}}</td>
     <td>{{ order_item.item.price * order_item.quantity }}</td>
+    <td>{{ render_payed(order_item.payed) }}</td>
   </tr>
   {% endfor %}
 </table>

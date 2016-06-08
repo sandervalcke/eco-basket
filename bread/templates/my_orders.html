@@ -1,4 +1,4 @@
-{% from "_macros.html" import render_field, render_field_nolabel %}
+{% from "_macros.html" import render_field, render_field_nolabel, render_payed %}
 
 {% extends "base.html" %}
 
@@ -11,7 +11,7 @@
   <h4><a href="{{url_for('single_order', id=order_data.order.id)}}">{{order_data.order.name}}</a></h4>
   <p>{{format_date(order_data.order.delivery_date)}}</p>
 </div>
-<div class="col-md-6">
+<div class="col-md-7">
 <form class="form-horizontal" method="POST">
   {{ order_data.form.order_id }}
   {{ order_data.form.csrf_token }}
@@ -22,6 +22,7 @@
           <th class="col-md-3">Item</th>
           <th class="col-md-1">Quantity</th>
           <th class="col-md-1">Price (€)</th>
+          <th class="col-md-1">Status</th>
           <th class="col-md-1"></th>
         </tr>
       </thead>
@@ -30,6 +31,7 @@
         <td>{{ order_item.item.name }}</td>
         <td>{{ order_item.quantity }}</td>
         <td>{{ order_item.item.price * order_item.quantity }}</td>
+        <td>{{ render_payed(order_item.payed) }}</td>
         <td>
           {% if not order_data.order.is_closed %}
           {# Will use 'name' to know if it's a delete button #}

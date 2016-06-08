@@ -24,3 +24,11 @@
     {% endif %}
   </div>
 {%- endmacro %}
+
+{% macro render_payed(is_payed) -%}
+  {% if not is_payed %}
+    <span class="label label-warning">To pay</span>
+  {% else %}
+    <span class="label label-success">Payed</span>
+  {% endif %}
+{%- endmacro %}
