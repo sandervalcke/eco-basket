@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 from flask import render_template, request, flash, redirect, url_for
 from flask.ext.security import login_required, roles_required, logout_user, current_user
@@ -56,7 +56,7 @@ def index():
 @app.route('/myorders', methods=['GET', 'POST'])
 @login_required
 def my_orders():
-    def create_form(order_id=None, mint=False):
+    def create_form(producer_id=None, order_id=None, mint=False):
         """
         :param mint If true, the form does not use existing request POST form data, if it exists.
          if False then the form will contain the request POST data.
@@ -67,22 +67,27 @@ def my_orders():
         if mint:
             form_kwargs['formdata'] = None
 
+        # Update the cache
+        if producer_id is not None and producer_id not in producer_items:
+            producer_items[producer_id] = database.DbItem.query.filter_by(producer_id=producer_id).all()
+
         order_item_form = AddOrderItemForm(**form_kwargs)
         order_item_form.item.choices = [(str(item.id), "{} (€ {})".format(item.name, item.price))
-                                        for item in items]
+                                        for item in producer_items[producer_id]]
         return order_item_form
 
-    def get_form(order_id):
+    def get_form(order_id, producer_id=None):
         """
         Create a mint form if the order_id is not that of the POSTed form, otherwise gives
         the existing and validated (-> contains validation errors) form.
         """
         if 'order_id' not in request.form or order_id != int(request.form['order_id']):
-            return create_form(order_id, mint=True)
+            return create_form(order_id=order_id, producer_id=producer_id, mint=True)
         else:
             return posted_order_item_form
 
-    items = database.DbItem.query.all()
+    # Cache the list of items of a producer. Key: producer ID. Value: items
+    producer_items = defaultdict(list)
     posted_order_item_form = create_form()
 
     if posted_order_item_form.is_submitted():
@@ -124,7 +129,9 @@ def my_orders():
             self.quantity = quantity
             self.price = price
 
-    order_data = {order.id: OrderData(order=order, items=[], form=get_form(order.id)) for order in orders_list}
+    order_data = {order.id: OrderData(order=order, items=[],
+                                      form=get_form(producer_id=order.producer_id, order_id=order.id))
+                                      for order in orders_list}
 
     for item in order_items:
         order_data[item.order_id].items.append(item)
@@ -137,8 +144,7 @@ def my_orders():
     return render_template(
         'my_orders.html',
         order_data_list=sorted(order_data.values(),
-                               key=lambda x: x.order.delivery_date_utc, reverse=True),
-        items=items
+                               key=lambda x: x.order.delivery_date_utc, reverse=True)
     )
 
 
