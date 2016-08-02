@@ -31,7 +31,7 @@
       <tr>
         <td>{{ order_item.item.name }}</td>
         <td>{{ order_item.quantity }}</td>
-        <td>{{ order_item.item.price * order_item.quantity }}</td>
+        <td>{{ format_currency(order_item.item.price * order_item.quantity) }}</td>
         <td>{{ render_payed(order_item.payed) }}</td>
         <td>
           {% if not order_data.order.is_closed %}

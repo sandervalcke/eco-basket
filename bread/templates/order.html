@@ -87,7 +87,7 @@
       <th>Status</th>
     </tr>
   </thead>
-  {% for order_item in order.order_items %}
+  {% for order_item in order_items %}
   <tr>
     <!--<td>{{ order_item.item.name }}</td>-->
       <td><div class="checkbox">
@@ -95,7 +95,7 @@
       </div></td>
     <td>{{ order_item.quantity }}</td>
     <td>{{ order_item.user.print_name()}}</td>
-    <td>{{ order_item.item.price * order_item.quantity }}</td>
+    <td>{{ format_currency(order_item.item.price * order_item.quantity) }}</td>
     <td>{{ render_payed(order_item.payed) }}</td>
   </tr>
   {% endfor %}

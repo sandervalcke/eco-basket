@@ -3,6 +3,7 @@ from collections import namedtuple, defaultdict
 from flask import render_template, request, flash, redirect, url_for
 from flask.ext.security import login_required, roles_required, logout_user, current_user
 from sqlalchemy.sql import func
+from sqlalchemy.orm import joinedload
 
 from bread.application import app, db
 from bread import database
@@ -156,6 +157,11 @@ def my_orders():
 @login_required
 def single_order(id):
     order = database.DbOrder.query.get(id)
+    order_items = (database.DbOrderItem.query
+                   .join(database.User)
+                   .join(database.DbItem)
+                   .filter(database.DbOrderItem.order_id==order.id)
+                   .order_by(database.User.first_name, database.DbItem.name).all())
     form = CsrfTokenForm()
 
     if form.validate_on_submit():
@@ -193,6 +199,7 @@ def single_order(id):
     return render_template(
         'order.html',
         order=order,
+        order_items=order_items,
         grouped_items=grouped_items,
         form=form
     )
