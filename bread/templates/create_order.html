@@ -1,0 +1,43 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+{% from "_macros.html" import render_field, render_field_nolabel %}
+
+{% set active_page = "producers" %}
+
+{% block content %}
+
+<div class="row">
+<h1>Create Order - {{producer.name}}</h1>
+
+<form class="form-horizontal" method="POST">
+{{ form.csrf_token }}
+<!--<div class="table-responsive">-->
+  <!--<table class="table table-condensed">-->
+    <!--<thead>-->
+    <!--<tr>-->
+      <!--<th class="col-md-2">Name</th>-->
+      <!--<th class="col-md-1">Price (€)</th>-->
+      <!--<th class="col-md-3">Description</th>-->
+    <!--</tr>-->
+    <!--</thead>-->
+    <!--{% for item in items %}-->
+    <!--<tr>-->
+      <!--<td><div class="checkbox">-->
+        <!--<label><input type="checkbox" name="item_{{item.id}}" value="1" checked>{{ item.name }}</label>-->
+      <!--</div></td>-->
+      <!--<td>{{ item.price }}</td>-->
+      <!--<td>{{ item.description or '' }}</td>-->
+    <!--</tr>-->
+    <!--{% endfor %}-->
+  <!--</table>-->
+<!--</div>-->
+<!--</div>-->
+{{ render_field(form.name) }}
+{{ render_field(form.closed_date) }}
+{{ render_field(form.delivery_date) }}
+{{ render_field(form.submit) }}
+</form>
+
+</div>
+
+{% endblock %}

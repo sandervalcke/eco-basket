@@ -1,0 +1,58 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% set active_page = "producers" %}
+
+{% block content %}
+<div class="row">
+<h1>{{ producer.name }}</h1>
+<a href="{{ url_for('producer_new_order', id=producer.id) }}" class="btn btn-default" role="button">Create Order</a>
+<a href="#" class="btn btn-default" role="button">Create Item</a>
+<h2>Description</h2>
+{{ producer.description or '' }}
+</div>
+
+<div class="row">
+<h2>Items</h2>
+<div class="table-responsive">
+  <table class="table table-condensed">
+    <thead>
+    <tr>
+      <th class="col-md-2">Name</th>
+      <th class="col-md-1">Price (€)</th>
+      <th class="col-md-3">Description</th>
+    </tr>
+    </thead>
+    {% for item in items %}
+    <tr>
+      <td>{{ item.name }}</td>
+      <td>{{ item.price }}</td>
+      <td>{{ item.description or '' }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+</div>
+
+<div class="row col-md-4">
+<h2>Orders</h2>
+<div class="table-responsive">
+  <table class="table table-condensed">
+    <thead>
+    <tr>
+      <th class="col-md-1">Closed Date</th>
+      <th class="col-md-1">Delivery Date</th>
+      <th class="col-md-2">Name</th>
+    </tr>
+    </thead>
+    {% for order in orders %}
+    <tr>
+      <td>{{ format_date(order.close_date) }}</td>
+      <td>{{ format_date(order.delivery_date) }}</td>
+      <td><a href="{{url_for('single_order', id=order.id)}}">{{order.name}}</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+</div>
+{% endblock %}

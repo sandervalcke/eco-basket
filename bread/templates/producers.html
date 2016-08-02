@@ -1,0 +1,25 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% set active_page = "producers" %}
+
+{% block content %}
+<div class="row">
+<div class="table-responsive">
+  <table class="table table-condensed">
+    <thead>
+    <tr>
+      <th class="col-md-2">Name</th>
+      <th class="col-md-4">Description</th>
+    </tr>
+    </thead>
+    {% for producer in producers %}
+    <tr>
+      <td><a href="{{url_for('producerpage', id=producer.id)}}">{{ producer.name }}</a></td>
+      <td>{{ producer.description or '' }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+</div>
+{% endblock %}
