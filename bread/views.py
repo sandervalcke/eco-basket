@@ -1,12 +1,12 @@
 from collections import namedtuple, defaultdict
 
 from flask import render_template, request, flash, redirect, url_for
-from flask.ext.security import login_required, roles_required, logout_user, current_user
+from flask_security import login_required, roles_required, roles_accepted, logout_user, current_user
 from sqlalchemy.sql import func
-from sqlalchemy.orm import joinedload
 
 from bread.application import app, db
 from bread import database
+from bread.security import CurrentUser, security_roles
 from bread.forms import (AddOrderItemForm, CreateOrderForm, CreateItemForm,
                          CreateProducerForm, CsrfTokenForm)
 
@@ -28,12 +28,23 @@ def utilty_processor():
         else:
             return ""
 
+    def get_role_label(role):
+        if role.name == 'admin':
+            return 'label-danger'
+        elif role.name == 'treasurer':
+            return 'label-info'
+        elif role.name == 'liason':
+            return 'label-warning'
+        else:
+            return 'label-default'
+
     def format_currency(currency):
         return "{:.1f}".format(currency)
 
     return dict(format_time=format_time,
                 format_date=format_date,
-                format_currency=format_currency)
+                format_currency=format_currency,
+                role_label=get_role_label)
 
 
 @app.context_processor
@@ -41,6 +52,9 @@ def inject_variables():
     menu_items = [('/myorders', 'my_orders', 'My Orders'),
                   ('/allorders', 'all_orders', 'All Orders'),
                   ('/producers', 'producers', 'Producers')]
+
+    if CurrentUser.has_role('admin'):
+        menu_items.append(('/users', 'users', 'Users'))
 
     if current_user.is_authenticated:
         menu_items.append(('/logout', 'logout', 'Logout'))
@@ -165,18 +179,20 @@ def single_order(id):
     form = CsrfTokenForm()
 
     if form.validate_on_submit():
-        # If mark_payed is pressed it is in request.form, otherwise mark_unpayed
-        # was pressed
-        payed = 'mark_payed' in request.form
+        if CurrentUser.check_any_role(security_roles.admin,
+                                      security_roles.treasurer):
+            # If mark_payed is pressed it is in request.form, otherwise mark_unpayed
+            # was pressed
+            payed = 'mark_payed' in request.form
 
-        for input_name in request.form:
-            if input_name.startswith('item_'):
-                input_id = int(input_name[5:])
-                order_item = database.DbOrderItem.query.get(input_id)
-                if order_item is not None:
-                    order_item.payed = payed
+            for input_name in request.form:
+                if input_name.startswith('item_'):
+                    input_id = int(input_name[5:])
+                    order_item = database.DbOrderItem.query.get(input_id)
+                    if order_item is not None:
+                        order_item.payed = payed
 
-        db.session.commit()
+            db.session.commit()
 
     if order is None:
         flash('Order {} not found'.format(id))
@@ -240,7 +256,7 @@ def producerpage(id):
 
 
 @app.route('/producers/<int:id>/orders/new', methods=['GET', 'POST'])
-@login_required
+@roles_accepted('admin', 'liaison')
 def producer_new_order(id):
     producer = database.DbProducer.query.get(id)
     items = database.DbItem.query.filter_by(producer_id=id).all()
@@ -257,7 +273,6 @@ def producer_new_order(id):
         db.session.commit()
         return redirect(url_for('producerpage', id=id))
 
-
     return render_template('create_order.html',
                            producer=producer,
                            items=items,
@@ -265,7 +280,7 @@ def producer_new_order(id):
 
 
 @app.route('/producers/<int:id>/items/new', methods=['GET', 'POST'])
-@login_required
+@roles_accepted('admin', 'liaison')
 def producer_new_item(id):
     producer = database.DbProducer.query.get(id)
     form = CreateItemForm()
@@ -285,6 +300,7 @@ def producer_new_item(id):
 
 
 @app.route('/producers/new', methods=['GET', 'POST'])
+@roles_accepted('admin', 'liaison')
 def producer_new():
     form = CreateProducerForm()
 
@@ -297,6 +313,16 @@ def producer_new():
 
     return render_template('producer_create.html',
                            form=form)
+
+
+@app.route('/users', methods=['GET'])
+@roles_required('admin')
+def users():
+    users = database.User.query.all()
+
+    return render_template('users.html',
+                           users=users)
+
 
 # @app.route('/test')
 # def test():
