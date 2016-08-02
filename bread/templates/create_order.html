@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<div class="row">
+<div class="row col-md-8 col-md-offset-2">
 <h1>Create Order - {{producer.name}}</h1>
 
 <form class="form-horizontal" method="POST">
@@ -35,7 +35,7 @@
 {{ render_field(form.name) }}
 {{ render_field(form.closed_date) }}
 {{ render_field(form.delivery_date) }}
-{{ render_field(form.submit) }}
+{{ render_field_nolabel(form.submit) }}
 </form>
 
 </div>
