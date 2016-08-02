@@ -1,0 +1,19 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+{% from "_macros.html" import render_field, render_field_nolabel %}
+
+{% block content %}
+
+<div class="row col-md-8 col-md-offset-2">
+<h1>Create Producer</h1>
+
+<form class="form-horizontal" method="POST">
+{{ form.csrf_token }}
+{{ render_field(form.name) }}
+{{ render_field(form.description) }}
+{{ render_field_nolabel(form.submit) }}
+</form>
+</div>
+
+{% endblock %}
+

@@ -24,3 +24,9 @@ class CreateItemForm(Form):
     description = TextAreaField('Description:')
     price = FloatField('Price:')
     submit = SubmitField('Save')
+
+
+class CreateProducerForm(Form):
+    name = StringField('Name:')
+    description = TextAreaField('Description:')
+    submit = SubmitField('Save')
