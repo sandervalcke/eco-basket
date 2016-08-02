@@ -6,7 +6,7 @@ from sqlalchemy.sql import func
 
 from bread.application import app, db
 from bread import database
-from bread.forms import AddOrderItemForm, CreateOrderForm
+from bread.forms import AddOrderItemForm, CreateOrderForm, CreateItemForm
 
 
 @app.context_processor
@@ -239,6 +239,25 @@ def producer_new_order(id):
                            items=items,
                            form=form)
 
+
+@app.route('/producers/<int:id>/items/new', methods=['GET', 'POST'])
+@login_required
+def producer_new_item(id):
+    producer = database.DbProducer.query.get(id)
+    form = CreateItemForm()
+
+    if form.validate_on_submit():
+        item = database.DbItem(name=form.name.data,
+                               description=form.description.data,
+                               price=form.price.data,
+                               producer=producer)
+        db.session.add(item)
+        db.session.commit()
+        return redirect(url_for('producerpage', id=id))
+
+    return render_template('item_create.html',
+                           form=form,
+                           producer=producer)
 
 # @app.route('/test')
 # def test():

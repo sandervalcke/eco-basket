@@ -7,7 +7,7 @@
 <div class="row">
 <h1>{{ producer.name }}</h1>
 <a href="{{ url_for('producer_new_order', id=producer.id) }}" class="btn btn-default" role="button">Create Order</a>
-<a href="#" class="btn btn-default" role="button">Create Item</a>
+<a href="{{ url_for('producer_new_item', id=producer.id) }}" class="btn btn-default" role="button">Create Item</a>
 <h2>Description</h2>
 {{ producer.description or '' }}
 </div>

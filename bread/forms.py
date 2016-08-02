@@ -1,6 +1,6 @@
 from flask_wtf import Form
 from wtforms import (SelectField, IntegerField, HiddenField, validators, DateField, SubmitField,
-                     StringField)
+                     StringField, FloatField, TextAreaField)
 # BooleanField, TextField, PasswordField, validators
 
 
@@ -16,4 +16,11 @@ class CreateOrderForm(Form):
     name = StringField('Name:')
     closed_date = DateField('Closed date:', format='%d/%m/%Y')
     delivery_date = DateField('Delivery date:', (validators.optional(),), format='%d/%m/%Y')
+    submit = SubmitField('Save')
+
+
+class CreateItemForm(Form):
+    name = StringField('Name:')
+    description = TextAreaField('Description:')
+    price = FloatField('Price:')
     submit = SubmitField('Save')
