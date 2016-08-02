@@ -75,6 +75,8 @@
 <div class="row">
 <h4>Individual Orders</h4>
 <div class="table-responsive">
+<form class="form-horizontal" method="POST">
+{{ form.csrf_token }}
 <table class="table table-condensed">
   <thead>
     <tr>
@@ -87,7 +89,10 @@
   </thead>
   {% for order_item in order.order_items %}
   <tr>
-    <td>{{ order_item.item.name }}</td>
+    <!--<td>{{ order_item.item.name }}</td>-->
+      <td><div class="checkbox">
+        <label><input type="checkbox" name="item_{{order_item.id}}" value="1">{{ order_item.item.name }}</label>
+      </div></td>
     <td>{{ order_item.quantity }}</td>
     <td>{{ order_item.user.print_name()}}</td>
     <td>{{ order_item.item.price * order_item.quantity }}</td>
@@ -95,6 +100,9 @@
   </tr>
   {% endfor %}
 </table>
+<button name="mark_unpayed" class="btn btn-default">Mark selected unpayed</button>
+<button name="mark_payed" class="btn btn-default">Mark selected payed</button>
+</form>
 </div>
 </div>
 {% endblock %}

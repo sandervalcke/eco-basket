@@ -7,7 +7,7 @@ from sqlalchemy.sql import func
 from bread.application import app, db
 from bread import database
 from bread.forms import (AddOrderItemForm, CreateOrderForm, CreateItemForm,
-                         CreateProducerForm)
+                         CreateProducerForm, CsrfTokenForm)
 
 
 @app.context_processor
@@ -152,10 +152,25 @@ def my_orders():
     )
 
 
-@app.route('/orders/<int:id>', methods=['GET'])
+@app.route('/orders/<int:id>', methods=['GET', 'POST'])
 @login_required
 def single_order(id):
     order = database.DbOrder.query.get(id)
+    form = CsrfTokenForm()
+
+    if form.validate_on_submit():
+        # If mark_payed is pressed it is in request.form, otherwise mark_unpayed
+        # was pressed
+        payed = 'mark_payed' in request.form
+
+        for input_name in request.form:
+            if input_name.startswith('item_'):
+                input_id = int(input_name[5:])
+                order_item = database.DbOrderItem.query.get(input_id)
+                if order_item is not None:
+                    order_item.payed = payed
+
+        db.session.commit()
 
     if order is None:
         flash('Order {} not found'.format(id))
@@ -178,7 +193,8 @@ def single_order(id):
     return render_template(
         'order.html',
         order=order,
-        grouped_items=grouped_items
+        grouped_items=grouped_items,
+        form=form
     )
 
 

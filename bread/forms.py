@@ -4,6 +4,13 @@ from wtforms import (SelectField, IntegerField, HiddenField, validators, DateFie
 # BooleanField, TextField, PasswordField, validators
 
 
+class CsrfTokenForm(Form):
+    """
+    Use this to get easy handling of csrf
+    """
+    pass
+
+
 class AddOrderItemForm(Form):
     # Set the choices after instantiating. Is a list of id-name tuples.
     order_id = HiddenField('order_id')
