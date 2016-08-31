@@ -1,6 +1,6 @@
 from flask_wtf import Form
 from wtforms import (SelectField, IntegerField, HiddenField, validators, DateField, SubmitField,
-                     StringField, FloatField, TextAreaField)
+                     StringField, FloatField, TextAreaField, FieldList)
 # BooleanField, TextField, PasswordField, validators
 
 
@@ -37,3 +37,8 @@ class CreateProducerForm(Form):
     name = StringField('Name:')
     description = TextAreaField('Description:')
     submit = SubmitField('Save')
+
+
+class UpdateOrderForm(Form):
+    submit = SubmitField('Save')
+    quantities = FieldList(IntegerField('Quantity', (validators.NumberRange(min=0),)))

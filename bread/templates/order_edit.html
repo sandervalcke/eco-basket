@@ -1,0 +1,42 @@
+{% from "_macros.html" import render_field, render_field_nolabel, render_payed %}
+
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div class="col-md-6">
+<div class="row">
+  <h1>{{ order.name }}</h1>
+    <p>Order closed: {{format_date(order.close_date)}}.
+    Delivery: {{format_date(order.delivery_date) or '? '}}.</p>
+</div>
+<div class="row">
+<form class="form-horizontal" method="POST">
+  {{ form.csrf_token }}
+  <div class="table-responsive">
+    <table class="table table-condensed">
+      <thead>
+        <tr>
+          <th class="col-md-3">Item</th>
+          <th class="col-md-2">Unit Price (€)</th>
+          <th class="col-md-1">Quantity</th>
+        </tr>
+      </thead>
+      {% for item, quantity_label in items_zip %}
+      <tr>
+        <td>{{ item.name }}</td>
+        <td>{{ item.price }}</td>
+        <td>{{ render_field_nolabel(quantity_label) }}</td>
+      </tr>
+      {# Order item loop #}
+      {% endfor %}
+    </table>
+  </div>
+  {{ render_field_nolabel(form.submit) }}
+</form>
+</div>
+</div>
+
+{% endblock %}

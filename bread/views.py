@@ -8,7 +8,7 @@ from bread.application import app, db
 from bread import database
 from bread.security import CurrentUser, security_roles
 from bread.forms import (AddOrderItemForm, CreateOrderForm, CreateItemForm,
-                         CreateProducerForm, CsrfTokenForm)
+                         CreateProducerForm, CsrfTokenForm, UpdateOrderForm)
 
 
 @app.context_processor
@@ -39,7 +39,7 @@ def utilty_processor():
             return 'label-default'
 
     def format_currency(currency):
-        return "{:.1f}".format(currency)
+        return "{:.2f}".format(currency)
 
     return dict(format_time=format_time,
                 format_date=format_date,
@@ -219,6 +219,55 @@ def single_order(id):
         grouped_items=grouped_items,
         form=form
     )
+
+
+@app.route('/orders/<int:id>/edit', methods=['GET', 'POST'])
+def edit_order(id):
+    order = database.DbOrder.query.get(id)
+
+    form = UpdateOrderForm()
+
+    # The ON clause of an SQL join is evaluated BEFORE the join, the WHERE clause AFTER the
+    # join. That's why we need to put the DbOrderItem filters in the ON clause, otherwise
+    # we throw away item records that don't have an order attached.
+    items = (db.session.query(database.DbItem.id,
+                              database.DbItem.name,
+                              database.DbItem.producer_id,
+                              database.DbItem.price,
+                              func.coalesce(database.DbOrderItem.quantity, 0).label('quantity'),
+                              database.DbOrderItem.user_id,
+                              database.DbOrderItem.order_id)
+             .outerjoin(database.DbOrderItem,
+                        (database.DbItem.id == database.DbOrderItem.item_id)
+                        & (database.DbOrderItem.order_id == order.id)
+                        & (database.DbOrderItem.user_id == current_user.id))
+             .filter(database.DbItem.producer_id == order.producer_id)
+             .all()
+             )
+
+    if form.is_submitted():
+        # Remove existing, we will save brand new ones
+        (database.DbOrderItem.query
+         .filter_by(order_id=order.id)
+         .filter_by(user_id=current_user.id).delete())
+
+        for quantity, item in zip(form.quantities, items):
+            # The order of the quantities matches that of the order of the items
+            order_item = database.DbOrderItem(order_id=order.id,
+                                              user_id=current_user.id,
+                                              item_id=item.id,
+                                              quantity=quantity.data)
+            db.session.add(order_item)
+        db.session.commit()
+        return redirect(url_for('my_orders'))
+    else:
+        for item in items:
+            form.quantities.append_entry(data=item.quantity)
+
+    return render_template('order_edit.html',
+                           order=order,
+                           items_zip=zip(items, form.quantities),
+                           form=form)
 
 
 @app.route('/allorders', methods=['GET'])
