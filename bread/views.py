@@ -225,6 +225,9 @@ def single_order(id):
 def edit_order(id):
     order = database.DbOrder.query.get(id)
 
+    if order.is_closed:
+        flash('This is order has been closed')
+
     form = UpdateOrderForm()
 
     # The ON clause of an SQL join is evaluated BEFORE the join, the WHERE clause AFTER the
@@ -246,20 +249,23 @@ def edit_order(id):
              )
 
     if form.is_submitted():
-        # Remove existing, we will save brand new ones
-        (database.DbOrderItem.query
-         .filter_by(order_id=order.id)
-         .filter_by(user_id=current_user.id).delete())
+        if not order.is_closed:
+            # We already flash at the top if the order is closed, not flashing again
 
-        for quantity, item in zip(form.quantities, items):
-            # The order of the quantities matches that of the order of the items
-            order_item = database.DbOrderItem(order_id=order.id,
-                                              user_id=current_user.id,
-                                              item_id=item.id,
-                                              quantity=quantity.data)
-            db.session.add(order_item)
-        db.session.commit()
-        return redirect(url_for('my_orders'))
+            # Remove existing, we will save brand new ones
+            (database.DbOrderItem.query
+             .filter_by(order_id=order.id)
+             .filter_by(user_id=current_user.id).delete())
+
+            for quantity, item in zip(form.quantities, items):
+                # The order of the quantities matches that of the order of the items
+                order_item = database.DbOrderItem(order_id=order.id,
+                                                  user_id=current_user.id,
+                                                  item_id=item.id,
+                                                  quantity=quantity.data)
+                db.session.add(order_item)
+            db.session.commit()
+            return redirect(url_for('my_orders'))
     else:
         for item in items:
             form.quantities.append_entry(data=item.quantity)

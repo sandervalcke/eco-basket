@@ -12,7 +12,9 @@
 </div>
 <div class="col-md-7">
 <p>
-  <a href="{{ url_for('edit_order', id=order_data.order.id) }}" class="btn btn-default" role="button">Edit</a>
+  {% if not order_data.order.is_closed %}
+    <a href="{{ url_for('edit_order', id=order_data.order.id) }}" class="btn btn-default" role="button">Edit</a>
+  {% endif %}
   Order closed: {{format_date(order_data.order.close_date)}}.
   Delivery: {{format_date(order_data.order.delivery_date) or '? '}}.
 </p>
