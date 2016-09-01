@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from collections import namedtuple
 
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import (Column, DateTime, Integer, String,
@@ -23,6 +24,12 @@ class Base(db.Model):
 
     id = Column(db.Integer, primary_key=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+roles = (namedtuple('RoleList', ['admin', 'treasurer', 'liaison'])
+         ('admin',
+          'treasurer',
+          'liaison'))
 
 
 class Role(Base, RoleMixin):
