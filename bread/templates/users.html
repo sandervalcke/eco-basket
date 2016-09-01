@@ -10,14 +10,16 @@
   <table class="table table-condensed">
     <thead>
     <tr>
+      <th class="col-md-1">Id</th>
       <th class="col-md-4">Email</th>
       <th class="col-md-2">First Name</th>
       <th class="col-md-2">Last Name</th>
-      <th class="col-md-4">Roles</th>
+      <th class="col-md-3">Roles</th>
     </tr>
     </thead>
     {% for user in users %}
     <tr>
+      <td>{{ user.id }}</td>
       <td>{{ user.email }}</td>
       <td>{{ user.first_name }}</td>
       <td>{{ user.last_name }}</td>
