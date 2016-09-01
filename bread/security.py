@@ -41,6 +41,10 @@ class CurrentUser(object):
         return Permission(*[RoleNeed(role) for role in roles])
 
     @staticmethod
+    def has_any_role(*roles):
+        return CurrentUser.has_any_role_permission(*roles).can()
+
+    @staticmethod
     def check_any_role(*roles):
         if CurrentUser.has_any_role_permission(*roles).can():
             return True
