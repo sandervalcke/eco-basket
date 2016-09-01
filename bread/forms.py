@@ -11,14 +11,6 @@ class CsrfTokenForm(Form):
     pass
 
 
-class AddOrderItemForm(Form):
-    # Set the choices after instantiating. Is a list of id-name tuples.
-    order_id = HiddenField('order_id')
-    producer_id = HiddenField('producer_id')
-    item = SelectField('Item')
-    quantity = IntegerField('Quantity', (validators.NumberRange(min=1),))
-
-
 class CreateOrderForm(Form):
     name = StringField('Name:')
     closed_date = DateField('Closed date:', format='%d/%m/%Y')

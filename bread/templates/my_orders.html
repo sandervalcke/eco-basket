@@ -18,43 +18,38 @@
   Order closed: {{format_date(order_data.order.close_date)}}.
   Delivery: {{format_date(order_data.order.delivery_date) or '? '}}.
 </p>
-<form class="form-horizontal" method="POST">
-  {{ order_data.form.order_id }}
-  {{ order_data.form.producer_id }}
-  {{ order_data.form.csrf_token }}
-  <div class="table-responsive">
-    <table class="table table-condensed">
-      <thead>
-        <tr>
-          <th class="col-md-3"></th>
-          <th class="col-md-1"></th>
-          <th class="col-md-1"></th>
-          <th class="col-md-1"></th>
-        </tr>
-      </thead>
-      {% for order_item in order_data.items %}
-      {% if order_item.quantity > 0 %}
-        <tr>
-          <td>{{ order_item.item.name }}</td>
-          <td>{{ order_item.quantity }}</td>
-          <td>{{ format_currency(order_item.item.price * order_item.quantity) }}</td>
-          <td>{{ render_payed(order_item.payed) }}</td>
-        </tr>
-      {% endif  %}
-      {# Order item loop #}
-      {% endfor %}
-      {#
-      Row for the total price
-      #}
+<div class="table-responsive">
+  <table class="table table-condensed">
+    <thead>
       <tr>
-        <td>Total</td>
-        <td>{{ order_data.quantity }}</td>
-        <td>{{ format_currency(order_data.price) }}</td>
-        <td></td>
+        <th class="col-md-3"></th>
+        <th class="col-md-1"></th>
+        <th class="col-md-1"></th>
+        <th class="col-md-1"></th>
       </tr>
-    </table>
-  </div>
-</form>
+    </thead>
+    {% for order_item in order_data.items %}
+    {% if order_item.quantity > 0 %}
+      <tr>
+        <td>{{ order_item.item.name }}</td>
+        <td>{{ order_item.quantity }}</td>
+        <td>{{ format_currency(order_item.item.price * order_item.quantity) }}</td>
+        <td>{{ render_payed(order_item.payed) }}</td>
+      </tr>
+    {% endif  %}
+    {# Order item loop #}
+    {% endfor %}
+    {#
+    Row for the total price
+    #}
+    <tr>
+      <td>Total</td>
+      <td>{{ order_data.quantity }}</td>
+      <td>{{ format_currency(order_data.price) }}</td>
+      <td></td>
+    </tr>
+  </table>
+</div>
 </div>
 </div>
 {# Loop over orders #}
