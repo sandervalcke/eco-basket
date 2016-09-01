@@ -5,19 +5,19 @@
 {% set active_page = "orders" %}
 
 {% block content %}
-<div class="row col-md-12">
+<div class="row">
 {% if not order.is_closed %}
   <a href="{{ url_for('edit_order', id=order.id) }}" class="btn btn-default" role="button">Edit my order</a>
 {% endif %}
 </div>
 <div class="row">
-<div class="col-md-6">
-<h4>Order Info</h4>
+<h3>Order Summary</h3>
+<div class="col-md-4">
 <div class="table-responsive">
 <table class="table table-condensed">
   <thead>
+    <th class="col-md-2">&nbsp;</th>
     <th class="col-md-2"></th>
-    <th class="col-md-4"></th>
   </thead>
   <tr>
     <td>Order</td>
@@ -60,14 +60,14 @@
 </table>
 </div>
 </div>
-<div class="col-md-6">
-<h4>Items</h4>
+
+<div class="col-md-4">
 <div class="table-responsive">
 <table class="table table-condensed">
   <thead>
   <tr>
-    <th class="col-md-4">Item</th>
-    <th class="col-md-2">Quantity</th>
+    <th class="col-md-3">Item</th>
+    <th class="col-md-1">Quantity</th>
   </tr>
   </thead>
   {% for grouped_item in grouped_items %}
@@ -79,10 +79,34 @@
 </table>
 </div>
 </div>
+
+<div class="col-md-4">
+<div class="table-responsive">
+<table class="table table-condensed">
+  <thead>
+    <tr>
+      <th>Customer</th>
+      <th>Quantity</th>
+      <th>To Pay (€)</th>
+    </tr>
+  </thead>
+  {% for customer in customers %}
+  {% if customer.quantity > 0 %}
+  <tr>
+    <td>{{ customer.User.print_name()}}</td>
+    <td>{{ customer.quantity }}</td>
+    <td>{{ format_currency(customer.price) }}</td>
+  </tr>
+  {% endif %}
+  {% endfor %}
+</table>
+</div>
+</div>
 </div>
 
-<div class="row col-md-12">
-<h4>Individual Orders</h4>
+<div class="row">
+<h3>All Items</h3>
+<div class="col-md-12">
 <div class="table-responsive">
 <form class="form-horizontal" method="POST">
 {{ form.csrf_token }}
@@ -114,6 +138,7 @@
 <button name="mark_unpayed" class="btn btn-default">Mark selected unpayed</button>
 <button name="mark_payed" class="btn btn-default">Mark selected payed</button>
 </form>
+</div>
 </div>
 </div>
 {% endblock %}

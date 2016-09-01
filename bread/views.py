@@ -140,18 +140,30 @@ def single_order(id):
         # to put load on DB, not on app.
         grouped_items = (db.session.query(func.sum(database.DbOrderItem.quantity).label('quantity'),
                                           database.DbItem.name)
-                         .join(database.DbOrder).filter(database.DbOrder.id == order.id)
+                         .join(database.DbOrder)
+                         .filter(database.DbOrder.id == order.id)
                          .join(database.DbItem)
                          .group_by(database.DbItem.name)
                          .order_by(database.DbItem.name)
                          .all()
                          )
 
+    customers = (db.session.query(func.sum(database.DbOrderItem.quantity).label('quantity'),
+                                  func.sum(database.DbItem.price * database.DbOrderItem.quantity).label('price'),
+                                  database.User)
+                 .join(database.DbOrder)
+                 .join(database.DbItem)
+                 .filter(database.DbOrder.id == order.id)
+                 .join(database.User)
+                 .group_by(database.User.id)
+                 .all())
+
     return render_template(
         'order.html',
         order=order,
         order_items=order_items,
         grouped_items=grouped_items,
+        customers=customers,
         form=form
     )
 
