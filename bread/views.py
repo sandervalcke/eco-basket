@@ -163,6 +163,18 @@ def edit_order(id):
     if order.is_closed:
         flash('This is order has been closed')
 
+    # If we specify ?user=.. then we're editing the order of another user. Can only
+    # do this if you have special powers
+    user_id = current_user.id
+    if request.args.get('user', None) is not None:
+        requested_id = int(request.args.get('user'))
+        # Check permission, only required if the requested user is not the current user
+        if ((not CurrentUser.has_any_role(database.roles.admin, database.roles.liaison))
+           and current_user.id != requested_id):
+            flash("You don't have the required permission to edit the order of someone else")
+        else:
+            user_id = requested_id
+
     form = UpdateOrderForm()
 
     # The ON clause of an SQL join is evaluated BEFORE the join, the WHERE clause AFTER the
@@ -178,7 +190,7 @@ def edit_order(id):
              .outerjoin(database.DbOrderItem,
                         (database.DbItem.id == database.DbOrderItem.item_id)
                         & (database.DbOrderItem.order_id == order.id)
-                        & (database.DbOrderItem.user_id == current_user.id))
+                        & (database.DbOrderItem.user_id == user_id))
              .filter(database.DbItem.producer_id == order.producer_id)
              .all()
              )
@@ -190,12 +202,12 @@ def edit_order(id):
             # Remove existing, we will save brand new ones
             (database.DbOrderItem.query
              .filter_by(order_id=order.id)
-             .filter_by(user_id=current_user.id).delete())
+             .filter_by(user_id=user_id).delete())
 
             for quantity, item in zip(form.quantities, items):
                 # The order of the quantities matches that of the order of the items
                 order_item = database.DbOrderItem(order_id=order.id,
-                                                  user_id=current_user.id,
+                                                  user_id=user_id,
                                                   item_id=item.id,
                                                   quantity=quantity.data)
                 db.session.add(order_item)
