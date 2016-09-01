@@ -24,8 +24,12 @@
     <td>{{order.name}}</td>
   </tr>
   <tr>
-    <td>Date</td>
-    <td>{{format_date(order.delivery_date)}}</td>
+    <td>Closed date</td>
+    <td>{{format_date(order.close_date)}}</td>
+  </tr>
+  <tr>
+    <td>Delivery date</td>
+    <td>{{format_date(order.delivery_date) or '?'}}</td>
   </tr>
   <tr>
     <td>Items</td>
