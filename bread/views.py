@@ -50,7 +50,8 @@ def utilty_processor():
 @app.context_processor
 def inject_variables():
     menu_items = [('/myorders', 'my_orders', 'My Orders'),
-                  ('/allorders', 'all_orders', 'All Orders'),
+                  ('/allorders', 'all_orders', 'Orders'),
+                  ('/orderlists', 'order_lists', 'Order Lists'),
                   ('/producers', 'producers', 'Producers')]
 
     if CurrentUser.has_role('admin'):
@@ -244,6 +245,43 @@ def all_orders():
         'all_orders.html',
         orders=orders
     )
+
+
+@app.route('/orderlists', methods=['GET'])
+def order_lists():
+    lists = database.DbOrderList.query.order_by(database.DbOrderList.id.desc()).all()
+
+    return render_template('order_lists.html',
+                           lists=lists)
+
+
+@app.route('/orderlists/<int:id>', methods=['GET'])
+def single_order_list(id):
+    order_list = database.DbOrderList.query.get(id)
+
+    orders = []
+    customers = []
+
+    if order_list is None:
+        flash('This order list does not exist')
+    else:
+        orders = database.DbOrder.query.filter_by(list_id=id).all()
+
+        # Very similar to query in single_order, could re-use code
+        customers = (db.session.query(func.sum(database.DbOrderItem.quantity).label('quantity'),
+                                      func.sum(database.DbItem.price * database.DbOrderItem.quantity).label('price'),
+                                      database.User)
+                     .join(database.DbOrder)
+                     .join(database.DbOrderList)
+                     .join(database.DbItem)
+                     .filter(database.DbOrderList.id == order_list.id)
+                     .join(database.User)
+                     .group_by(database.User.id)
+                     .all())
+
+    return render_template('order_list_single.html',
+                           orders=orders,
+                           customers=customers)
 
 
 @app.route('/producers', methods=['GET'])

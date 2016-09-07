@@ -1,0 +1,27 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% set active_page = "index" %}
+
+{% block content %}
+<div class="row">
+<div class="col-md-6 col-md-offset-3">
+<div class="table-responsive">
+<table class="table table-condensed">
+  <thead>
+  <tr>
+      <th>Id</th>
+      <th>Name</th>
+  </tr>
+  </thead>
+  {% for list in lists %}
+  <tr>
+      <td>{{ list.id }}</td>
+      <td><a href="{{url_for('single_order_list', id=list.id)}}">{{ list.name }}</a></td>
+  </tr>
+</table>
+</div>
+</div>
+</div>
+{% endfor %}
+{% endblock %}

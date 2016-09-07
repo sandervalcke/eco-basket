@@ -106,15 +106,27 @@ class DbItem(Base):
         return "{}".format(self.name)
 
 
+class DbOrderList(Base):
+    __tablename__ = 'orderlist'
+    name = Column(String(80), nullable=False)
+
+    orders = relationship('DbOrder', backref='orderlist')
+
+    def __repr__(self):
+        return "({}) {}".format(self.id, self.name)
+
+
 class DbOrder(Base):
     __tablename__ = 'orders'
     name = Column(String(80), nullable=False)
     delivery_date_utc = Column(DateTime())
     close_date_utc = Column(DateTime())
     producer_id = Column(Integer, ForeignKey('producers.id'), nullable=False)
+    list_id = Column(Integer, ForeignKey('orderlist.id'), nullable=True)
 
     producer = relationship('DbProducer')
     # backref order_items
+    # backref orderlist
 
     @staticmethod
     def compute_quantity(order_items):
