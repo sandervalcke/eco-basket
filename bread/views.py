@@ -1,7 +1,6 @@
-from collections import namedtuple, defaultdict
-
 from flask import render_template, request, flash, redirect, url_for
 from flask_security import login_required, roles_required, roles_accepted, logout_user, current_user
+from sqlalchemy import case
 from sqlalchemy.sql import func
 
 from bread.application import app, db
@@ -286,9 +285,14 @@ def single_order_list(id):
     else:
         orders = database.DbOrder.query.filter_by(list_id=id).all()
 
+        count_payed = case([(database.DbOrderItem.payed,
+                             database.DbItem.price * database.DbOrderItem.quantity)],
+                           else_=0)
+
         # Very similar to query in single_order, could re-use code
         customers = (db.session.query(func.sum(database.DbOrderItem.quantity).label('quantity'),
-                                      func.sum(database.DbItem.price * database.DbOrderItem.quantity).label('price'),
+                                      func.sum(database.DbItem.price * database.DbOrderItem.quantity).label('total_price'),
+                                      func.sum(count_payed).label('payed'),
                                       database.User)
                      .join(database.DbOrder)
                      .join(database.DbOrderList)
