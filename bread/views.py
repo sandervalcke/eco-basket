@@ -7,8 +7,9 @@ from sqlalchemy.sql import func
 from bread.application import app, db
 from bread import database
 from bread.security import CurrentUser, security_roles
-from bread.forms import (CreateOrderForm, CreateItemForm,
-                         CreateProducerForm, CsrfTokenForm, UpdateOrderForm)
+from bread.forms import (CreateOrderForm, CreateItemForm, CreateOrderListForm,
+                         CreateProducerForm, CsrfTokenForm, UpdateOrderForm,
+                         AddOrdersToListForm)
 
 
 @app.context_processor
@@ -257,6 +258,21 @@ def order_lists():
                            lists=lists)
 
 
+@app.route('/orderlists/new', methods=['GET', 'POST'])
+@roles_accepted(database.roles.admin, database.roles.liaison)
+def order_list_new():
+    form = CreateOrderListForm()
+
+    if form.validate_on_submit():
+        order_list = database.DbOrderList(name=form.name.data)
+        db.session.add(order_list)
+        db.session.commit()
+        return redirect(url_for('single_order_list', id=order_list.id))
+
+    return render_template('order_list_new.html',
+                           form=form)
+
+
 @app.route('/orderlists/<int:id>', methods=['GET'])
 @login_required
 def single_order_list(id):
@@ -286,6 +302,34 @@ def single_order_list(id):
                            list=order_list,
                            orders=orders,
                            customers=customers)
+
+
+@app.route('/orderlists/<int:id>/orders/add', methods=['GET', 'POST'])
+@roles_accepted(database.roles.admin, database.roles.liaison)
+def order_list_add_orders(id):
+    order_list = database.DbOrderList.query.get(id)
+    if order_list is None:
+        flash('This order list does not exist')
+        return redirect('index')
+
+    orders = database.DbOrder.query.filter_by(list_id=None).all()
+    form = AddOrdersToListForm()
+
+    if form.validate_on_submit():
+        for input_name in request.form:
+            if input_name.startswith('order_'):
+                input_id = int(input_name[6:])
+                order = database.DbOrder.query.get(input_id)
+                if order is not None:
+                    order.list_id = id
+
+        db.session.commit()
+
+        return redirect(url_for('single_order_list', id=order_list.id))
+
+    return render_template('order_list_orders_add.html',
+                           orders=orders,
+                           form=form)
 
 
 @app.route('/producers', methods=['GET'])

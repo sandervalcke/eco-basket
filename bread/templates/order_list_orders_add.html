@@ -1,0 +1,42 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+{% from "_macros.html" import render_field, render_field_nolabel %}
+
+{% set active_page = "order_lists" %}
+
+{% block content %}
+
+<div class="row">
+<div class="col-md-6 col-md-offset-3">
+<h2>Orders</h2>
+<p>Note: only orders not yet assigned to an order list are shown. An order can only be part of one order list.</p>
+<div class="table-responsive">
+<form class="form-horizontal" method="POST">
+{{ form.csrf_token }}
+<table class="table table-condensed">
+  <thead>
+  <tr>
+      <th class="col-md-1"></th>
+      <th class="col-md-1">Id</th>
+      <th>Name</th>
+      <th class="col-md-1">Closed</th>
+      <th class="col-md-1">Delivery</th>
+  </tr>
+  </thead>
+  {% for order in orders %}
+  <tr>
+      <td><input type="checkbox" name="order_{{order.id}}" value="1"/></td>
+      <td>{{ order.id }}</td>
+      <td><a href="{{url_for('single_order', id=order.id)}}">{{ order.name }}</a></td>
+      <td>{{format_date(order.close_date)}}</td>
+      <td>{{format_date(order.delivery_date)}}</td>
+  </tr>
+  {% endfor %}
+</table>
+{{ render_field_nolabel(form.submit) }}
+</form>
+</div>
+</div>
+</div>
+
+{% endblock %}

@@ -6,6 +6,7 @@
 {% block content %}
 <div class="row">
 <div class="col-md-6 col-md-offset-3">
+<a href="{{ url_for('order_list_new') }}" class="btn btn-default" role="button">Create Order List</a>
 <div class="table-responsive">
 <table class="table table-condensed">
   <thead>
@@ -19,9 +20,9 @@
       <td>{{ list.id }}</td>
       <td><a href="{{url_for('single_order_list', id=list.id)}}">{{ list.name }}</a></td>
   </tr>
+  {% endfor %}
 </table>
 </div>
 </div>
 </div>
-{% endfor %}
 {% endblock %}

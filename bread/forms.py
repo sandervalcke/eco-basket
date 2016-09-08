@@ -34,3 +34,12 @@ class CreateProducerForm(Form):
 class UpdateOrderForm(Form):
     submit = SubmitField('Save')
     quantities = FieldList(IntegerField('Quantity', (validators.NumberRange(min=0),)))
+
+
+class CreateOrderListForm(Form):
+    name = StringField('Name:')
+    save = SubmitField('Save')
+
+
+class AddOrdersToListForm(Form):
+    submit = SubmitField('Add Orders')

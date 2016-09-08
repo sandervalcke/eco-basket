@@ -1,0 +1,20 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+{% from "_macros.html" import render_field, render_field_nolabel %}
+
+{% set active_page = "order_lists" %}
+
+{% block content %}
+
+<div class="row col-md-6 col-md-offset-3">
+<h1>Create Order List</h1>
+
+<form class="form-horizontal" method="POST">
+{{ form.csrf_token }}
+
+{{ render_field(form.name) }}
+{{ render_field_nolabel(form.save) }}
+</form>
+</div>
+
+{% endblock %}
