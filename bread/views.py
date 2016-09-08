@@ -175,7 +175,7 @@ def edit_order(id):
     order = database.DbOrder.query.get(id)
 
     if order.is_closed:
-        flash('This is order has been closed')
+        flash('This order has been closed')
 
     # If we specify ?user=.. then we're editing the order of another user. Can only
     # do this if you have special powers
@@ -210,7 +210,8 @@ def edit_order(id):
              )
 
     if form.is_submitted():
-        if not order.is_closed:
+        # admin can modify orders even after they are closed
+        if not order.is_closed or CurrentUser.has_role(database.roles.admin):
             # We already flash at the top if the order is closed, not flashing again
 
             # Remove existing, we will save brand new ones
