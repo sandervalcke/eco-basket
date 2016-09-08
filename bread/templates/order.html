@@ -71,10 +71,12 @@
   </tr>
   </thead>
   {% for grouped_item in grouped_items %}
+  {% if grouped_item.quantity > 0 %}
   <tr>
     <td>{{ grouped_item.name }}</td>
     <td>{{ grouped_item.quantity }}</td>
   </tr>
+  {% endif %}
   {% endfor %}
 </table>
 </div>
