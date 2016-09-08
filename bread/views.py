@@ -170,6 +170,7 @@ def single_order(id):
 
 
 @app.route('/orders/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
 def edit_order(id):
     order = database.DbOrder.query.get(id)
 
@@ -248,6 +249,7 @@ def all_orders():
 
 
 @app.route('/orderlists', methods=['GET'])
+@login_required
 def order_lists():
     lists = database.DbOrderList.query.order_by(database.DbOrderList.id.desc()).all()
 
@@ -256,6 +258,7 @@ def order_lists():
 
 
 @app.route('/orderlists/<int:id>', methods=['GET'])
+@login_required
 def single_order_list(id):
     order_list = database.DbOrderList.query.get(id)
 
@@ -280,6 +283,7 @@ def single_order_list(id):
                      .all())
 
     return render_template('order_list_single.html',
+                           list=order_list,
                            orders=orders,
                            customers=customers)
 

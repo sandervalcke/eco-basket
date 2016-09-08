@@ -1,11 +1,12 @@
 <!-- extend base layout -->
 {% extends "base.html" %}
 
-{% set active_page = "index" %}
+{% set active_page = "order_lists" %}
 
 {% block content %}
 <div class="col-md-6 col-md-offset-3">
 <div class="row">
+<h1>{{ list.name }}</h1>
 <h2>Orders</h2>
 <div class="table-responsive">
 <table class="table table-condensed">
