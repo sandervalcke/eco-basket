@@ -91,7 +91,7 @@ def my_orders():
     order_data = {order.id: OrderData(order=order, items=[]) for order in orders_list}
 
     for item in order_items:
-        order_data[item.item_in_order.order_id].items.append(item)
+        order_data[item.order_id].items.append(item)
 
     # Add some computed stuff, must do because items for this user only
     for _, data in order_data.items():
@@ -204,8 +204,11 @@ def edit_order(id):
                               database.DbItemInOrder.order_id
                               )
              .join(database.DbItemInOrder)
+             .filter(database.DbItemInOrder.order_id == order.id)
              .outerjoin(database.DbOrderItem,
-                        (database.DbOrderItem.user_id == user_id)
+                          (database.DbOrderItem.user_id == user_id)
+                        & (database.DbOrderItem.item_id == database.DbItemInOrder.item_id)
+                        & (database.DbOrderItem.order_id == database.DbItemInOrder.order_id)
                         )
              .all()
              )
@@ -215,31 +218,21 @@ def edit_order(id):
         if not order.is_closed or CurrentUser.has_role(database.roles.admin):
             # We already flash at the top if the order is closed, not flashing again
 
-            # records = (database.DbOrderItem.query
-            #             .filter(database.DbOrderItem.user_id == user_id)
-            #             .join(database.DbItemInOrder)
-            #             .filter(database.DbItemInOrder.order_id == order.id)
-            #             .all())
-            #
-            #
-            # (db.session.query(database.DbOrderItem)
-            #  .filter(database.DbOrderItem.user_id == user_id)
-            #  .join(database.DbItemInOrder)
-            #  .filter(database.DbItemInOrder.order_id == order.id)
-            #  .delete())
             # Remove existing, we will save brand new ones
             (db.session.query(database.DbOrderItem)
-             .filter(database.DbOrderItem.user_id == user_id)
-             .filter(database.DbOrderItem.item_in_order.has(database.DbItemInOrder.order_id == order.id))
-             .delete(synchronize_session='fetch')
-             )
+             .filter_by(user_id=user_id)
+             .filter_by(order_id=order.id)
+             .delete())
 
             for quantity, item in zip(form.quantities, items):
-                # The order of the quantities matches that of the order of the items
-                order_item = database.DbOrderItem(item_id=item.id,
-                                                  order_id=order.id,
-                                                  user_id=user_id,
-                                                  quantity=quantity.data)
+                # We deleted everything above -> only need to save those that
+                # are > 0
+                if quantity.data > 0:
+                    # The order of the quantities matches that of the order of the items
+                    order_item = database.DbOrderItem(item_id=item.id,
+                                                      order_id=order.id,
+                                                      user_id=user_id,
+                                                      quantity=quantity.data)
                 db.session.add(order_item)
             db.session.commit()
             return redirect(url_for('my_orders'))

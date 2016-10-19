@@ -181,7 +181,8 @@ class DbItemInOrder(db.Model):
     item_id = Column(Integer, ForeignKey('items.id'), primary_key=True, nullable=False)
     order_id = Column(Integer, ForeignKey('orders.id'), primary_key=True, nullable=False)
 
-    item  = relationship('DbItem')
+    item = relationship('DbItem')
+    order = relationship('DbOrder')
 
 
 class DbOrderItem(Base):
@@ -199,7 +200,6 @@ class DbOrderItem(Base):
 
     user = relationship('User')
     item = relationship('DbItem')
-    item_in_order = relationship('DbItemInOrder')
     order = relationship('DbOrder', backref='order_items')
 
     # Composite foreign key
