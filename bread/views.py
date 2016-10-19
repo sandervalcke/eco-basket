@@ -2,6 +2,7 @@ from flask import render_template, request, flash, redirect, url_for
 from flask_security import login_required, roles_required, roles_accepted, logout_user, current_user
 from sqlalchemy import case
 from sqlalchemy.sql import func
+from sqlalchemy.orm import joinedload
 
 from bread.application import app, db
 from bread import database
@@ -76,7 +77,8 @@ def index():
 def my_orders():
     orders_list = (database.DbOrder.query
                    .order_by(database.DbOrder.close_date_utc.desc()).all())
-    order_items = database.DbOrderItem.query.filter(database.DbOrderItem.user_id == current_user.id).all()
+    order_items = (database.DbOrderItem.query
+                   .filter(database.DbOrderItem.user_id == current_user.id).all())
 
     # Link customer's orders to the order lists
     class OrderData(object):
@@ -89,7 +91,7 @@ def my_orders():
     order_data = {order.id: OrderData(order=order, items=[]) for order in orders_list}
 
     for item in order_items:
-        order_data[item.order_id].items.append(item)
+        order_data[item.item_in_order.order_id].items.append(item)
 
     # Add some computed stuff, must do because items for this user only
     for _, data in order_data.items():
@@ -199,13 +201,12 @@ def edit_order(id):
                               database.DbItem.producer_id,
                               database.DbItem.price,
                               func.coalesce(database.DbOrderItem.quantity, 0).label('quantity'),
-                              database.DbOrderItem.user_id,
-                              database.DbOrderItem.order_id)
+                              database.DbItemInOrder.order_id
+                              )
+             .join(database.DbItemInOrder)
              .outerjoin(database.DbOrderItem,
-                        (database.DbItem.id == database.DbOrderItem.item_id)
-                        & (database.DbOrderItem.order_id == order.id)
-                        & (database.DbOrderItem.user_id == user_id))
-             .filter(database.DbItem.producer_id == order.producer_id)
+                        (database.DbOrderItem.user_id == user_id)
+                        )
              .all()
              )
 
@@ -214,16 +215,30 @@ def edit_order(id):
         if not order.is_closed or CurrentUser.has_role(database.roles.admin):
             # We already flash at the top if the order is closed, not flashing again
 
+            # records = (database.DbOrderItem.query
+            #             .filter(database.DbOrderItem.user_id == user_id)
+            #             .join(database.DbItemInOrder)
+            #             .filter(database.DbItemInOrder.order_id == order.id)
+            #             .all())
+            #
+            #
+            # (db.session.query(database.DbOrderItem)
+            #  .filter(database.DbOrderItem.user_id == user_id)
+            #  .join(database.DbItemInOrder)
+            #  .filter(database.DbItemInOrder.order_id == order.id)
+            #  .delete())
             # Remove existing, we will save brand new ones
-            (database.DbOrderItem.query
-             .filter_by(order_id=order.id)
-             .filter_by(user_id=user_id).delete())
+            (db.session.query(database.DbOrderItem)
+             .filter(database.DbOrderItem.user_id == user_id)
+             .filter(database.DbOrderItem.item_in_order.has(database.DbItemInOrder.order_id == order.id))
+             .delete(synchronize_session='fetch')
+             )
 
             for quantity, item in zip(form.quantities, items):
                 # The order of the quantities matches that of the order of the items
-                order_item = database.DbOrderItem(order_id=order.id,
+                order_item = database.DbOrderItem(item_id=item.id,
+                                                  order_id=order.id,
                                                   user_id=user_id,
-                                                  item_id=item.id,
                                                   quantity=quantity.data)
                 db.session.add(order_item)
             db.session.commit()
@@ -286,14 +301,14 @@ def single_order_list(id):
     else:
         orders = database.DbOrder.query.filter_by(list_id=id).all()
 
-        count_payed = case([(database.DbOrderItem.payed,
-                             database.DbItem.price * database.DbOrderItem.quantity)],
-                           else_=0)
+        # count_payed = case([(database.DbOrderItem.payed,
+        #                      database.DbItem.price * database.DbOrderItem.quantity)],
+        #                    else_=0)
 
         # Very similar to query in single_order, could re-use code
         customers = (db.session.query(func.sum(database.DbOrderItem.quantity).label('quantity'),
                                       func.sum(database.DbItem.price * database.DbOrderItem.quantity).label('total_price'),
-                                      func.sum(count_payed).label('payed'),
+                                      # func.sum(count_payed).label('payed'),
                                       database.User)
                      .join(database.DbOrder)
                      .join(database.DbOrderList)

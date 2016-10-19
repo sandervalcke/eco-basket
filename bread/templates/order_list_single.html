@@ -45,8 +45,6 @@
     <tr>
       <th class="col-md-2">Customer</th>
       <th class="col-md-1">Items</th>
-      <th class="col-md-1">To Pay (€)</th>
-      <th class="col-md-1">Payed (€)</th>
       <th class="col-md-1">Total (€)</th>
     </tr>
   </thead>
@@ -55,8 +53,7 @@
   <tr>
     <td>{{ customer.User.print_name()}}</td>
     <td>{{ customer.quantity }}</td>
-    <td>{{ format_currency(customer.total_price - customer.payed) }}</td>
-    <td>{{ format_currency(customer.payed) }}</td>
+
     <td>{{ format_currency(customer.total_price) }}</td>
   </tr>
   {% endif %}

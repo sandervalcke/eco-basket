@@ -44,10 +44,6 @@
     <td>€ {{ format_currency(order.price_to_be_payed) }}</td>
   </tr>
   <tr>
-    <td>Payed</td>
-    <td>€ {{ format_currency(order.price_payed) }}</td>
-  </tr>
-  <tr>
     <td>Status</td>
     <td>
       {% if order.is_closed %}

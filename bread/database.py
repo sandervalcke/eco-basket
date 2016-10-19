@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from collections import namedtuple
 
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy.schema import ForeignKeyConstraint
 from sqlalchemy import (Column, DateTime, Integer, String,
                         ForeignKey, Float, Boolean, Text)
 from flask.ext.security import RoleMixin, UserMixin
@@ -155,12 +156,12 @@ class DbOrder(Base):
     @property
     def price_to_be_payed(self):
         return sum([order_item.item.price * order_item.quantity
-                    for order_item in self.order_items if not order_item.payed])
+                    for order_item in self.order_items])
 
-    @property
-    def price_payed(self):
-        return sum([order_item.item.price * order_item.quantity
-                    for order_item in self.order_items if order_item.payed])
+    # @property
+    # def price_payed(self):
+    #     return sum([order_item.item.price * order_item.quantity
+    #                 for order_item in self.order_items if order_item.payed])
 
     @property
     def is_closed(self):
@@ -170,14 +171,39 @@ class DbOrder(Base):
         return "{} ({})".format(self.name, self.delivery_date_utc)
 
 
-class DbOrderItem(Base):
-    __tablename__ = 'order_items'
-    order_id = Column(Integer, ForeignKey('orders.id'), nullable=False)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    item_id = Column(Integer, ForeignKey('items.id'), nullable=False)
-    quantity = Column(Integer, nullable=False, server_default='0')
-    payed = Column(Boolean, nullable=False, server_default='0')
+class DbItemInOrder(db.Model):
+    """
+    The items that are in an order i.e. the list of items that can be
+    chosen bought by a user in a single order
+    """
+    __tablename__ = 'items_in_orders'
 
-    order = relationship('DbOrder', backref='order_items')
+    item_id = Column(Integer, ForeignKey('items.id'), primary_key=True, nullable=False)
+    order_id = Column(Integer, ForeignKey('orders.id'), primary_key=True, nullable=False)
+
     item  = relationship('DbItem')
-    user  = relationship('User')
+
+
+class DbOrderItem(Base):
+    """
+    Number of a certain item in an order a certain user has bought
+    """
+    __tablename__ = 'order_items'
+
+    # item_in_order_id = Column(Integer, ForeignKey('items_in_orders.id'), nullable=False)
+    item_id = Column(Integer, ForeignKey('items.id'), nullable=False)
+    order_id = Column(Integer, ForeignKey('orders.id'), nullable=False)
+
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    quantity = Column(Integer, nullable=False, server_default='0')
+
+    user = relationship('User')
+    item = relationship('DbItem')
+    item_in_order = relationship('DbItemInOrder')
+    order = relationship('DbOrder', backref='order_items')
+
+    # Composite foreign key
+    __table_args__ = (ForeignKeyConstraint(
+                        [item_id, order_id],
+                        [DbItemInOrder.item_id, DbItemInOrder.order_id]),
+                      {})
